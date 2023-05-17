@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './PokemonList.css';
 
 const PokemonList = () => {
   const [pokemonList, setPokemonList] = useState([]);
@@ -6,7 +7,7 @@ const PokemonList = () => {
 
   useEffect(() => {
     fetch('https://pokeapi.co/api/v2/pokemon?limit=151')
-      .then(response => response.json())
+      .then(respuesta => respuesta.json())
       .then(data => setPokemonList(data.results));
   }, []);
 
@@ -14,41 +15,33 @@ const PokemonList = () => {
     setSearchTerm(event.target.value);
   };
 
-  const filteredPokemon = pokemonList.filter(pokemon =>
-    pokemon.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const getPokemonImageUrl = id => {
     return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
   };
 
-  const chunkArray = (array, size) => {
-    const chunkedArray = [];
-    for (let i = 0; i < array.length; i += size) {
-      chunkedArray.push(array.slice(i, i + size));
-    }
-    return chunkedArray;
-  };
-
-  const rows = chunkArray(filteredPokemon, 5);
+  const filteredPokemon = pokemonList.filter(pokemon =>
+    pokemon.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <input type="text" placeholder="Buscar Pokémon" onChange={handleSearch} style={{ marginBottom: '10px' }} />
-      {rows.map((row, rowIndex) => (
-        <div key={rowIndex} style={{ display: 'flex' }}>
-          {row.map((pokemon) => (
-            <div key={pokemon.name} style={{ marginRight: '10px', textAlign: 'center' }}>
-              <img
-                src={getPokemonImageUrl(pokemonList.indexOf(pokemon) + 1)}
-                alt={pokemon.name}
-                style={{ maxWidth: '100%', height: 'auto' }}
-              />
-              {pokemon.name}
-            </div>
-          ))}
-        </div>
-      ))}
+    <div className="pokemon-list-container">
+      <input
+        type="text"
+        placeholder="Buscar Pokémon"
+        onChange={handleSearch}
+        className="search-input"
+      />
+      <ul className="pokemon-list">
+        {filteredPokemon.map(pokemon => (
+          <li key={pokemon.name} className="pokemon-item">
+            <img
+              src={getPokemonImageUrl(pokemon.url.split('/')[6])}
+              className="pokemon-image"
+            />
+            <span className="pokemon-name">{pokemon.name}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
